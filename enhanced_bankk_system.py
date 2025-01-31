@@ -148,8 +148,6 @@ def main():
         # Create an account
         if choice == 1:
             username = input("Enter Account-name: ")
-            # start_balance = 0
-            # start_loan = 0
             print(create_account(username, balance=0, loan=0))
 
         # Deposit to an account
