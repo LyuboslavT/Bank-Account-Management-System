@@ -79,12 +79,12 @@ def check_balance(account, balance):
 
 def list_accounts(account, balance, loan):
     """List all account holders and details."""
-    pass
-    # index_list_all_accounts = account_holders.index(account)
-    # index_all_balances = balances.index(account)
-    # index_all_loans = loans.index(account)
-    #
-    # return  account[index_list_all_accounts], balance[index_all_balances], loan[index_all_loans]
+
+    account = account_holders
+    balance = balances
+    loan = loans
+
+    return list(zip(account, balance, loan))
 
 
 def transfer_funds(account, target_account, amount):
@@ -118,11 +118,19 @@ def view_transaction_history(account, operation):
     index_transaction_history = account_holders.index(account)
     return transaction_histories[index_transaction_history]
 
-def apply_for_loan():
+def apply_for_loan(account, period, amount, money_to_return):
     """Allow user to apply for a loan."""
-    pass  # TODO: Add logic
+    if amount > MAX_LOAN_AMOUNT:
+        return f'You are eligible only for maximum amount of {MAX_LOAN_AMOUNT}'
 
-def repay_loan():
+    index_loan = account_holders.index(account)
+    loans[index_loan] += amount
+    transaction_histories[index_loan].append(f"Loan: {money_to_return:.2f}")
+    balances[index_loan] += money_to_return
+
+    return f'You have been accepted for a loan with an amount {amount:.2f}\nYou need to return total of {money_to_return:.2f}'
+
+def repay_loan(account, amount_returned, remaining_loan):
     """Allow user to repay a loan."""
     pass  # TODO: Add logic
 
@@ -137,54 +145,86 @@ def main():
         choice = int(input("Enter your choice: "))
         # Map choices to functions
 
+        # Create an account
         if choice == 1:
             username = input("Enter Account-name: ")
             # start_balance = 0
             # start_loan = 0
             print(create_account(username, balance=0, loan=0))
 
+        # Deposit to an account
         elif choice == 2:
             username = input("Enter Account-name: ")
-            deposit_amount = float(input("Enter amount to deposit: "))
-            print(deposit(account=username, amount=deposit_amount))
-            #TODO: make the available money visible
-            # print(f'You have {balances} available in your account!')
+            if username in account_holders:
+                deposit_amount = float(input("Enter amount to deposit: "))
+                print(deposit(account=username, amount=deposit_amount))
+                print(check_balance(account=username, balance=balances))
+
+            else:
+                print("Account with this name does not exist in the system.")
+                print("Do you want to create an account?")
+                option = input("Enter Yes or No: ")
 
 
+                if option != "Yes":
+                    print("Thank You for using our services. Goodbye!")
+                    break
+
+                else:
+                    print(create_account(username, balance=0, loan=0))
+
+
+        # Withdraw from an account
         elif choice == 3:
             username = input("Enter Account-name: ")
             withdraw_amount = float(input("Enter amount to withdraw: "))
             print(withdraw(account=username, amount=withdraw_amount))
-            #TODO: make the money left visible
-            # print(f'You have {balances} money left in your account!')
+            print(check_balance(account=username, balance=balances))
 
+        # Check current balance of an account
         elif choice == 4:
             username = input("Enter Account-name: ")
-            current_balance = balances
-            print(check_balance(account=username, balance=current_balance))
+            print(check_balance(account=username, balance=balances))
 
+        # List all accounts
         elif choice == 5:
-            print(list_accounts(account_holders, balances, loans))
 
+            all_accounts = account_holders
+            all_balances = balances
+            all_loans = loans
+            print(list_accounts(all_accounts, all_balances, all_loans))
+
+        # Transfer funds from Account A to Account B
         elif choice == 6:
             username = input('From which account: ')
             targeted_account = input("Recipient: ")
             transfer_amount = float(input("Transfer amount: "))
             print(transfer_funds(account=username, target_account=targeted_account, amount=transfer_amount))
-            #TODO: make the money left visible
-            # print(f'You have {balances} money left in your account!')
+            print(check_balance(account=username, balance=balances))
 
+        # View transaction history of an account
         elif choice == 7:
-            username = input()
+            username = input("Enter username: ")
             print(view_transaction_history(account=username, operation=transaction_histories))
 
+        # Apply for loan main logic
         elif choice == 8:
-            apply_for_loan()
+            username = input("Enter Account name: ")
+            loan_amount = float(input("Enter desired amount: "))
+            loan_period = int(input("Enter a period for returning the loan: "))
+            return_money = loan_amount * (INTEREST_RATE * loan_period) + loan_amount
+            print(apply_for_loan(account=username, amount=loan_amount, period=loan_period, money_to_return=return_money))
+
+        # Repay loan main logic
         elif choice == 9:
             repay_loan()
+
+        # Identify bank cars main logic
         elif choice == 10:
             identify_card_type()
-        elif choice not in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]:
+
+
+        elif choice == 0:
             print("Goodbye! 👋")
             break
         else:
