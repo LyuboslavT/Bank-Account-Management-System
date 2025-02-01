@@ -6,7 +6,9 @@ from zoneinfo import available_timezones
 account_holders = []  # Account names
 balances = []         # Account balances
 transaction_histories = []  # Account transaction logs
-loans = []            # Account loan details
+loans = []             # Account loan details
+loan_periods = []
+card_number_str = []
 
 MAX_LOAN_AMOUNT = 10000
 INTEREST_RATE = 0.03
@@ -54,18 +56,25 @@ def deposit(account, amount):
     transaction_histories[index_deposit].append(f'Deposited: {amount}')
     return f'You have deposited {amount} successfully!'
 
+
 def withdraw(account, amount):
     """Withdraw money from an account."""
     if account not in account_holders:
         return f'Error: Account "{account}" does not exist in the system!'
 
     if amount <= 0:
-        return f"Error: Deposit amount must be greater than Zero!"
+        return f"Error: Withdraw amount must be greater than Zero!"
 
     index_withdraw = account_holders.index(account)
+
+    if balances[index_withdraw] < amount:
+        return 'Insufficient amount, please make a deposit'
+
+
     balances[index_withdraw] -= amount
     transaction_histories[index_withdraw].append(f'Withdrawn: {amount}')
     return f'You have withdrawn {amount} successfully!'
+
 
 def check_balance(account, balance):
     """Check balance of an account."""
@@ -118,25 +127,61 @@ def view_transaction_history(account, operation):
     index_transaction_history = account_holders.index(account)
     return transaction_histories[index_transaction_history]
 
+
 def apply_for_loan(account, period, amount, money_to_return):
     """Allow user to apply for a loan."""
+
+    global loans, balances, transaction_histories
+
+    if account not in account_holders:
+        return f'Error: Account "{account}" does not exist in the system!'
+
     if amount > MAX_LOAN_AMOUNT:
         return f'You are eligible only for maximum amount of {MAX_LOAN_AMOUNT}'
-
     index_loan = account_holders.index(account)
     loans[index_loan] += amount
+    loan_periods.append(period)
     transaction_histories[index_loan].append(f"Loan: {money_to_return:.2f}")
     balances[index_loan] += money_to_return
 
     return f'You have been accepted for a loan with an amount {amount:.2f}\nYou need to return total of {money_to_return:.2f}'
 
-def repay_loan(account, amount_returned, remaining_loan):
-    """Allow user to repay a loan."""
-    pass  # TODO: Add logic
 
-def identify_card_type():
+def repay_loan(account,amount_returned):
+    """Allow user to repay a loan."""
+    if account not in account_holders:
+        return f'Error: Account "{account}" does not exist in the system!'
+
+
+    index_remaining_loan = account_holders.index(account)
+
+    if loans[index_remaining_loan] <= 0:
+        return f'You have no more loans!'
+
+    loans[index_remaining_loan] -= amount_returned
+    current_loan = loans[index_remaining_loan] * INTEREST_RATE * loan_periods[index_remaining_loan] + loans[index_remaining_loan] - amount_returned
+    balances[index_remaining_loan] -= amount_returned
+    transaction_histories[index_remaining_loan].append(f"Loan return: {amount_returned:.2f}")
+
+    if loans[index_remaining_loan] <= 0:
+        return f'Congratulations! You have fully repaid your loan.'
+
+    return f'You have returned {amount_returned} successfully. {current_loan} more remaining.'
+
+
+
+def identify_card_type(card_number):
     """Identify type of credit card."""
-    pass  # TODO: Add logic
+    if card_number.startswith("4") and (len(card_number) == 13 or len(card_number) == 16 or len(card_number) == 19):
+
+        return 'Your card is a VISA'
+
+    elif 2221 >= (int(card_number[:4]) <= 2720 or 51 >= int(card_number[:2]) <= 55) and len(card_number) == 16:
+        return 'Your card is a Mastercard'
+
+
+    return "Unknown card!"
+
 
 def main():
     """Run the banking system."""
@@ -215,11 +260,15 @@ def main():
 
         # Repay loan main logic
         elif choice == 9:
-            repay_loan()
+            username = input("Enter Account name: ")
+            loan_return = float(input("Enter amount to return: "))
+
+            print(repay_loan(account=username, amount_returned=loan_return))
 
         # Identify bank cars main logic
         elif choice == 10:
-            identify_card_type()
+            card_number_input = input("Enter card number: ")
+            print(identify_card_type(card_number=card_number_input))
 
 
         elif choice == 0:
