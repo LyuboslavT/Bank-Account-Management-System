@@ -10,27 +10,11 @@
 5. **Version Control and Collaboration**: Use GitHub for submission, version tracking, and feedback.
 6. **Critical Thinking**: Implement a credit card type checker and integrate it with other features.
 
----
 
-### **📁 Project Structure**
-
-```plaintext
-EnhancedBankSystem/
-├── main.py                # Main program file
-├── README.md              # Project documentation
-├── test/                  # Folder for testing scripts
-│   ├── test_main.py       # Unit tests for all functions
-├── submission/            # Folder where students push GitHub URLs
-│   ├── student1.txt       # URL of Student 1's GitHub repository
-│   ├── student2.txt       # URL of Student 2's GitHub repository
-└── .gitignore             # File to exclude unnecessary files from Git tracking
-```
-
----
 
 ### **📜 Step-by-Step Instructions**
 
-#### **1️⃣ Tasks and Features**
+#### **1️⃣ Features**
 1. **Create a Bank Account**
    - Prompt user for account name.
    - Add account with `0` balance and initialize a loan amount to `0`.
@@ -71,16 +55,18 @@ EnhancedBankSystem/
 
 #### **2️⃣ Credit Card Type Identification 💳**
 
-Add a new functionality to identify credit card types based on the card number.
-Rules for identifying credit card types:
+Added a new functionality to identify credit card types based on the card number.
+
+
+📌 Implementation Steps:
+
+Created a new function: identify_card_type(),
+which prompts the user to input their card number
+and identify the type of the card as stated here:
 
 Visa: Card number starts with 4 (e.g., 4123...).
 MasterCard: Card number starts with numbers between 51 and 55 (e.g., 5123...).
 American Express: Card number starts with 34 or 37 (e.g., 3712...).
 Other: If the card number doesn’t match the above patterns.
-📌 Implementation Steps:
 
-Create a new function: identify_card_type().
-Prompt the user to input their card number.
-Use if and elif conditions to check the card prefix.
-Print the card type to the user.
+
